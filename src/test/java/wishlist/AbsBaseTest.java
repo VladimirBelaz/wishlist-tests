@@ -24,8 +24,8 @@ public abstract class AbsBaseTest {
     protected LoginPage loginPage;
     protected WishListsPage wishListsPage;
 
-    protected static final String USERNAME = System.getProperty("USERNAME", "vladimirbv");
-    protected static final String PASSWORD = System.getProperty("PASSWORD", "E17wfz25Zm");
+    protected static final String USERNAME = System.getProperty("USERNAME", "petrIvanovich");
+    protected static final String PASSWORD = System.getProperty("PASSWORD", "alpenGold");
     protected static final String BASE_URL = System.getProperty("BASE_URL", "https://wishlist.otus.kartushin.su");
 
     @BeforeEach

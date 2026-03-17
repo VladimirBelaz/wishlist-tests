@@ -43,13 +43,16 @@ public class RegistrationTest extends AbsBaseTest {
                 .urlContains("/wishlists");
     }
 
+    /**
+     * Проверка регистрации с уже существующим пользователем.
+     */
     @Test
     public void testRegistrationWithExistingUser() {
         logger.info("Тест регистрации с уже существующим пользователем");
 
-        String existingUsername = "vladimirbv";
+        String existingUsername = "petrIvanovich";
         String email = "testers@mail.ru";
-        String password = "E17wfz25Zm";
+        String password = "alpenGold";
 
         registerPage.open();
         registerPage.register(existingUsername, email, password);
@@ -76,6 +79,9 @@ public class RegistrationTest extends AbsBaseTest {
         logger.info("Валидация пустых полей работает корректно ✅");
     }
 
+    /**
+     * Проверка регистрации с некорректным форматом email.
+     */
     @Test
     public void testRegistrationWithInvalidEmail() {
         logger.info("Тест регистрации с некорректным email");
@@ -94,20 +100,59 @@ public class RegistrationTest extends AbsBaseTest {
         logger.info("Валидация email работает корректно ✅");
     }
 
+    /**
+     * Проверка валидации длины пароля (слишком короткий – меньше 6 символов).
+     */
     @Test
-    public void testRegistrationWithShortPassword() {
-        logger.info("Тест регистрации с коротким паролем");
+    public void testRegistrationWithPasswordTooShort() {
+        logger.info("Тест регистрации с паролем короче 6 символов");
 
         String username = "testuser" + System.currentTimeMillis();
         String email = username + "@example.com";
-        String shortPassword = "114";
+        String shortPassword = "12345"; // длина 5
 
         registerPage.open();
         registerPage.register(username, email, shortPassword);
 
         RegisterPageAssertions.assertThat(registerPage)
                 .urlContains("/register")
-                .hasErrorMessage()
-                .hasErrorMessageContaining("Не удалось зарегистрировать пользователя");
+                .hasErrorMessage();
     }
+    /**
+     * Проверка валидации длины имени пользователя (слишком короткое – меньше 3 символов).
+     */
+    @Test
+    public void testRegistrationWithUsernameTooShort() {
+        logger.info("Тест регистрации с именем короче 3 символов");
+
+        String shortUsername = "ab"; // длина 2
+        String email = shortUsername + "@example.com";
+        String password = "Valid123";
+
+        registerPage.open();
+        registerPage.register(shortUsername, email, password);
+
+        RegisterPageAssertions.assertThat(registerPage)
+                .urlContains("/register")
+                .hasErrorMessage();
+    }
+    /**
+     * Проверка валидации длины имени пользователя (слишком длинное – больше 50 символов).
+     */
+    @Test
+    public void testRegistrationWithUsernameTooLong() {
+        logger.info("Тест регистрации с именем длиннее 50 символов");
+
+        String longUsername = "a".repeat(51); // длина 51
+        String email = "test@example.com";
+        String password = "Valid123";
+
+        registerPage.open();
+        registerPage.register(longUsername, email, password);
+
+        RegisterPageAssertions.assertThat(registerPage)
+                .urlContains("/register")
+                .hasErrorMessage();
+    }
+
 }

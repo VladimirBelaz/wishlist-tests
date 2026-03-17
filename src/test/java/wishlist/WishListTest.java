@@ -43,22 +43,22 @@ public class WishListTest extends AbsBaseTest {
         login();
 
         String listTitle = createTestWishList("Список для подарков");
-
         wishListsPage.waitForPageToLoad();
-
         wishListsPage.clickLastWishListView();
 
         WishListDetailPage detailPage = new WishListDetailPage(driver);
         detailPage.waitForPageToLoad();
 
-        String giftName = "PlayStation 5";
-        String giftDescription = "Очень хочу!";
-        String giftPrice = "50000";
+        String giftName = "Борщец";
+        String giftDescription = "Со сметаной";
+        String giftPrice = "223";
+        String storeUrl = "https://images.news.ru/2025/09/27/JrbizNSXHtBr2kN7Jmmvk8P1bzRFV2fqwVXWBEi0_780.png";
+        String imageUrl = "https://images.news.ru/2025/09/27/JrbizNSXHtBr2kN7Jmmvk8P1bzRFV2fqwVXWBEi0_780.png";
 
         int initialGiftsCount = detailPage.getGiftsCount();
         logger.info("Начальное количество подарков: {}", initialGiftsCount);
 
-        boolean isAdded = detailPage.addGift(giftName, giftDescription, giftPrice);
+        boolean isAdded = detailPage.addGift(giftName, giftDescription, giftPrice, storeUrl, imageUrl);
 
         if (!isAdded) {
             logger.error("Подарок не был добавлен из-за ошибки на сервере");

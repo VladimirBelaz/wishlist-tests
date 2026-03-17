@@ -19,11 +19,11 @@ public class RegisterPage extends AbsBasePage {
     }
 
     // Локаторы
-    private By usernameInputBy = By.cssSelector("input[type='text']");
-    private By emailInputBy = By.cssSelector("input[type='email']");
-    private By passwordInputBy = By.cssSelector("input[type='password']");
-    private By registerButtonBy = By.cssSelector("button[type='submit']");
-    private By errorAlertBy = By.cssSelector(".alert.alert-danger");
+    private final By usernameInputBy = By.cssSelector("input[type='text']");
+    private final By emailInputBy = By.cssSelector("input[type='email']");
+    private final By passwordInputBy = By.cssSelector("input[type='password']");
+    private final By registerButtonBy = By.cssSelector("button[type='submit']");
+    private final By errorAlertBy = By.cssSelector(".alert.alert-danger");
     /**
      * Заполняет поле имени пользователя.
      *

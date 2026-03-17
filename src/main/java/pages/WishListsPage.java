@@ -5,36 +5,39 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
+
 import java.util.List;
+
 /**
- * Page Object для страницы конкретного списка желаний.
- * Содержит методы для добавления подарков, удаления списка,
- * получения информации о подарках и ожидания загрузки страницы.
+ * Page Object для главной страницы со списками желаний (/wishlists).
+ * Позволяет создавать, просматривать, удалять списки,
+ * а также получать информацию о существующих списках.
  */
 public class WishListsPage extends AbsBasePage {
-
+    /**
+     * Конструктор страницы списков желаний.
+     *
+     * @param driver экземпляр WebDriver
+     */
     public WishListsPage(WebDriver driver) {
         super(driver, "/wishlists");
     }
 
-    @FindBy(css = ".btn-primary")
-    private WebElement createNewListButton;
-
-    @FindBy(css = "h2")
-    private WebElement pageTitle;
-
-    private By wishListCardsBy = By.cssSelector(".col .card");
+    // Локаторы
+    private final By createNewListButtonBy = By.cssSelector(".btn-primary");
+    private final By pageTitleBy = By.cssSelector("h2");
+    private final By wishListCardsBy = By.cssSelector(".col .card");
+    private final By modalTitleInputBy = By.cssSelector(".modal-content input[type='text']");
+    private final By modalDescriptionInputBy = By.cssSelector(".modal-content textarea");
+    private final By modalSubmitButtonBy = By.cssSelector(".modal-content button[type='submit']");
 
     private int countBeforeCreation = 0;
 
     @Override
     public void waitForPageToLoad() {
         logger.info("Ожидание загрузки страницы списков");
-
-        // Ждем заголовок и кнопку - они есть всегда
-        waiters.waitForElementVisible(pageTitle);
-        waiters.waitForElementVisible(createNewListButton);
+        waiters.waitForElementVisible(pageTitleBy);
+        waiters.waitForElementVisible(createNewListButtonBy);
 
         try {
             Thread.sleep(500);
@@ -46,37 +49,89 @@ public class WishListsPage extends AbsBasePage {
         logger.info("На странице найдено {} списков", cardsCount);
     }
 
+    /**
+     * Возвращает текущее количество списков на странице.
+     *
+     * @return количество списков
+     */
     public int getWishListsCount() {
         return driver.findElements(wishListCardsBy).size();
     }
 
-    public void clickCreateNewList() {
-        logger.info("Клик по кнопке 'Создать новый список'");
-        waiters.waitForElementClickable(createNewListButton).click();
-        waiters.waitForElementVisible(By.cssSelector(".modal-content input[type='text']"));
+    /**
+     * Возвращает все карточки списков (с ожиданием).
+     *
+     * @return список WebElement карточек
+     */
+    public List<WebElement> getWishLists() {
+        return waiters.waitForElementsPresent(wishListCardsBy);
     }
 
+    /**
+     * Возвращает название списка по индексу.
+     *
+     * @param index индекс списка (0-based)
+     * @return название списка
+     */
+    public String getWishListTitle(int index) {
+        List<WebElement> cards = getWishLists();
+        if (cards.isEmpty() || index >= cards.size()) {
+            logger.warn("Список с индексом {} не найден", index);
+            return "";
+        }
+        String title = cards.get(index).findElement(By.cssSelector(".card-title")).getText();
+        return title;
+    }
+
+    /**
+     * Кликает по кнопке "Создать новый список".
+     */
+    public void clickCreateNewList() {
+        logger.info("Клик по кнопке 'Создать новый список'");
+        waiters.waitForElementClickable(createNewListButtonBy).click();
+        waiters.waitForElementVisible(modalTitleInputBy);
+    }
+
+    /**
+     * Заполняет название списка в модальном окне.
+     *
+     * @param title название списка
+     */
     public void fillListTitle(String title) {
         logger.info("Заполнение названия списка: {}", title);
-        WebElement input = waiters.waitForElementVisible(By.cssSelector(".modal-content input[type='text']"));
+        WebElement input = waiters.waitForElementVisible(modalTitleInputBy);
         input.clear();
         input.sendKeys(title);
     }
 
+    /**
+     * Заполняет описание списка в модальном окне.
+     *
+     * @param description описание
+     */
     public void fillListDescription(String description) {
         logger.info("Заполнение описания списка: {}", description);
-        WebElement textarea = waiters.waitForElementVisible(By.cssSelector(".modal-content textarea"));
+        WebElement textarea = waiters.waitForElementVisible(modalDescriptionInputBy);
         textarea.clear();
         textarea.sendKeys(description);
     }
 
+    /**
+     * Отправляет форму создания списка.
+     */
     public void submitCreateList() {
         logger.info("Отправка формы создания списка");
-        WebElement submitButton = waiters.waitForElementClickable(By.cssSelector(".modal-content button[type='submit']"));
+        WebElement submitButton = waiters.waitForElementClickable(modalSubmitButtonBy);
         submitButton.click();
         waiters.waitForElementInvisible(By.cssSelector(".modal-content"));
     }
 
+    /**
+     * Создаёт новый список желаний.
+     *
+     * @param title       название
+     * @param description описание
+     */
     public void createWishList(String title, String description) {
         logger.info("Создание нового списка: {}", title);
 
@@ -93,31 +148,9 @@ public class WishListsPage extends AbsBasePage {
         waitForWishListToBeCreated();
     }
 
-    public void clickDeleteWishList(int index) {
-        logger.info("Клик по кнопке 'Удалить' для списка с индексом: {}", index);
-
-        List<WebElement> cards = getWishLists();
-
-        if (cards.isEmpty()) {
-            throw new WishListNotFoundException("Нет ни одного списка для удаления");
-        }
-
-        if (index >= cards.size()) {
-            throw new WishListNotFoundException(index);
-        }
-
-        WebElement card = cards.get(index);
-        WebElement deleteButton = card.findElement(By.cssSelector(".btn-danger"));
-
-        // Прокручиваем к кнопке и кликаем
-        ((JavascriptExecutor) driver).executeScript(
-                "arguments[0].scrollIntoView({block: 'center'}); arguments[0].click();",
-                deleteButton
-        );
-
-        logger.info("Клик по кнопке 'Удалить' выполнен");
-    }
-
+    /**
+     * Ожидает, пока количество списков станет равным countBeforeCreation + 1.
+     */
     public void waitForWishListToBeCreated() {
         logger.info("Ожидание создания нового списка. Было: {}, ожидаем: {}",
                 countBeforeCreation, countBeforeCreation + 1);
@@ -134,21 +167,11 @@ public class WishListsPage extends AbsBasePage {
         }
     }
 
-    public List<WebElement> getWishLists() {
-        return driver.findElements(wishListCardsBy);
-    }
-
-    public String getWishListTitle(int index) {
-        List<WebElement> cards = getWishLists();
-        if (cards.isEmpty() || index >= cards.size()) {
-            logger.warn("Список с индексом {} не найден", index);
-            return "";
-        }
-        String title = cards.get(index).findElement(By.cssSelector(".card-title")).getText();
-        return title;
-    }
-
-
+    /**
+     * Кликает по кнопке "Просмотр" для списка с указанным индексом.
+     *
+     * @param index индекс списка
+     */
     public void clickViewWishList(int index) {
         logger.info("Клик по кнопке 'Просмотр' для списка с индексом: {}", index);
 
@@ -165,7 +188,6 @@ public class WishListsPage extends AbsBasePage {
         }
 
         WebElement card = cards.get(index);
-
         String currentUrl = driver.getCurrentUrl();
 
         WebElement link = card.findElement(By.cssSelector("a[href*='/wishlists/']"));
@@ -196,6 +218,9 @@ public class WishListsPage extends AbsBasePage {
         logger.info("Перешли на страницу списка: {}", driver.getCurrentUrl());
     }
 
+    /**
+     * Кликает по кнопке "Просмотр" для последнего созданного списка.
+     */
     public void clickLastWishListView() {
         int totalLists = getWishListsCount();
         if (totalLists > 0) {
@@ -205,12 +230,45 @@ public class WishListsPage extends AbsBasePage {
         }
     }
 
+    /**
+     * Кликает по кнопке "Удалить" для списка с указанным индексом.
+     *
+     * @param index индекс списка
+     */
+    public void clickDeleteWishList(int index) {
+        logger.info("Клик по кнопке 'Удалить' для списка с индексом: {}", index);
 
+        List<WebElement> cards = getWishLists();
 
+        if (cards.isEmpty()) {
+            throw new WishListNotFoundException("Нет ни одного списка для удаления");
+        }
+
+        if (index >= cards.size()) {
+            throw new WishListNotFoundException(index);
+        }
+
+        WebElement card = cards.get(index);
+        WebElement deleteButton = card.findElement(By.cssSelector(".btn-danger"));
+
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].scrollIntoView({block: 'center'}); arguments[0].click();",
+                deleteButton
+        );
+
+        logger.info("Клик по кнопке 'Удалить' выполнен");
+    }
+
+    /**
+     * Проверяет, отображается ли на странице список с заданным названием.
+     *
+     * @param title название списка
+     * @return true, если список найден
+     */
     public boolean isWishListDisplayed(String title) {
         logger.info("Проверка наличия списка с названием: {}", title);
 
-        List<WebElement> cards = getWishLists();
+        List<WebElement> cards = driver.findElements(wishListCardsBy);
 
         for (WebElement card : cards) {
             WebElement titleElement = card.findElement(By.cssSelector(".card-title"));
@@ -224,5 +282,17 @@ public class WishListsPage extends AbsBasePage {
 
         logger.info("Список с названием '{}' не найден", title);
         return false;
+    }
+
+    /**
+     * Ожидает, пока количество списков станет равным expectedCount.
+     *
+     * @param expectedCount ожидаемое количество
+     */
+    public void waitForWishListCount(int expectedCount) {
+        logger.info("Ожидание количества списков: {}", expectedCount);
+        waiters.waitForCondition(driver ->
+                driver.findElements(wishListCardsBy).size() == expectedCount
+        );
     }
 }
