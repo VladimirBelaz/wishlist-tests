@@ -70,13 +70,13 @@ public class WishListTest extends AbsBaseTest {
 
         boolean isAdded = detailPage.addGift(giftName, giftDescription, giftPrice, storeUrl, imageUrl);
 
-        // Проверка успешности добавления через ассерт
+        // Проверка успешности добавления
         WishListDetailPageAssertions.assertThat(detailPage)
                 .giftAddedSuccessfully(isAdded);
 
         int newCount = detailPage.getGiftsCount();
         logger.info("Количество подарков после добавления: {}", newCount);
-
+        //проверка того, что подарок был успешно добавлен в список и отображается корректно
         WishListDetailPageAssertions.assertThat(detailPage)
                 .hasTitle(listTitle)
                 .hasGiftCount(initialGiftsCount + 1)
