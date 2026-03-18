@@ -76,7 +76,7 @@ src/
 
 ### Команды Maven
 
-#### Запуск всех тестов (Chrome)
+## Запуск всех тестов (Chrome)
 ```mvn clean test```
 ## Запуск в Firefox
 ```mvn clean test -Pfirefox-tests```
