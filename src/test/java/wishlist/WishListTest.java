@@ -13,6 +13,11 @@ import java.util.List;
  */
 public class WishListTest extends AbsBaseTest {
 
+    /**
+     * Тест создания нового списка желаний.
+     * Проверяет, что после создания списка его количество увеличивается на 1,
+     * а сам список отображается на странице с указанным названием.
+     */
     @Test
     public void testCreateWishList() {
         logger.info("Тест создания списка желаний");
@@ -36,6 +41,11 @@ public class WishListTest extends AbsBaseTest {
         logger.info("Список желаний успешно создан ✅");
     }
 
+    /**
+     * Тест добавления подарка в существующий список.
+     * Проверяет, что после заполнения всех полей модального окна
+     * подарок появляется в списке, а количество подарков увеличивается на 1.
+     */
     @Test
     public void testAddGiftToWishList() {
         logger.info("Тест добавления подарка в список");
@@ -60,10 +70,12 @@ public class WishListTest extends AbsBaseTest {
 
         boolean isAdded = detailPage.addGift(giftName, giftDescription, giftPrice, storeUrl, imageUrl);
 
-        if (!isAdded) {
-            logger.error("Подарок не был добавлен из-за ошибки на сервере");
-            Assertions.fail("Не удалось добавить подарок: ошибка сервера");
-        }
+        // Проверка успешности добавления через ассерт
+        WishListDetailPageAssertions.assertThat(detailPage)
+                .giftAddedSuccessfully(isAdded);
+
+        int newCount = detailPage.getGiftsCount();
+        logger.info("Количество подарков после добавления: {}", newCount);
 
         WishListDetailPageAssertions.assertThat(detailPage)
                 .hasTitle(listTitle)
@@ -72,7 +84,12 @@ public class WishListTest extends AbsBaseTest {
 
         logger.info("Тест завершен успешно ✅");
     }
-
+    /**
+     * Тест удаления списка желаний.
+     * Если списков нет – создаёт новый и затем удаляет его.
+     * Если списки есть – удаляет последний.
+     * Проверяет уменьшение количества списков на 1 и отсутствие удалённого названия.
+     */
     @Test
     public void testDeleteWishList() {
         logger.info("Тест удаления списка желаний");
@@ -101,7 +118,12 @@ public class WishListTest extends AbsBaseTest {
                 .wishListCountDecreasedByOne(beforeDelete)
                 .wishListIsDeleted(deletedTitle);
     }
-
+    /**
+     * Тест удаления всех списков желаний.
+     * Гарантирует наличие хотя бы одного списка (при необходимости создаёт),
+     * затем последовательно удаляет все списки (всегда первый).
+     * Проверяет, что в итоге количество списков равно 0.
+     */
     @Test
     public void testDeleteAllWishLists() {
         logger.info("Тест удаления всех списков желаний");
@@ -124,7 +146,12 @@ public class WishListTest extends AbsBaseTest {
 
         logger.info("Все списки успешно удалены ✅");
     }
-
+    /**
+     * Тест просмотра деталей списка.
+     * Создаёт список с уникальным названием и описанием,
+     * открывает его страницу и проверяет соответствие заголовка и описания,
+     * а также отсутствие подарков.
+     */
     @Test
     public void testViewWishListDetails() {
         logger.info("Тест просмотра деталей списка");
@@ -156,7 +183,12 @@ public class WishListTest extends AbsBaseTest {
 
         logger.info("Детали списка отображаются корректно ✅");
     }
-
+    /**
+     * Тест создания нескольких списков подряд.
+     * Создаёт три списка с разными префиксами,
+     * проверяет, что общее количество увеличилось на 3,
+     * и что каждый из созданных списков отображается на странице.
+     */
     @Test
     public void testCreateMultipleWishLists() {
         logger.info("Тест создания нескольких списков");

@@ -78,4 +78,9 @@ public class WishListDetailPageAssertions {
                 "Название подарка с индексом " + index + " не совпадает");
         return this;
     }
+
+    public WishListDetailPageAssertions giftAddedSuccessfully(boolean isAdded) {
+        Assertions.assertTrue(isAdded, "Подарок не был добавлен (ошибка сервера)");
+        return this;
+    }
 }

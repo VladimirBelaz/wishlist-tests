@@ -2,6 +2,7 @@ package assertions;
 
 import org.junit.jupiter.api.Assertions;
 import pages.RegisterPage;
+
 /**
  * Набор проверок для страницы регистрации.
  * Включает проверки серверных ошибок, сообщений валидации HTML5 и URL.
@@ -13,6 +14,7 @@ public class RegisterPageAssertions {
     private RegisterPageAssertions(RegisterPage page) {
         this.page = page;
     }
+
     /**
      * Фабричный метод для создания экземпляра ассерта.
      *
@@ -22,8 +24,9 @@ public class RegisterPageAssertions {
     public static RegisterPageAssertions assertThat(RegisterPage page) {
         return new RegisterPageAssertions(page);
     }
+
     /**
-     * Проверяет, что отображается сообщение об ошибке.
+     * Проверяет, что отображается сообщение об ошибке (серверное).
      *
      * @return этот же объект ассерта
      */
@@ -32,6 +35,7 @@ public class RegisterPageAssertions {
                 "Должно отображаться сообщение об ошибке");
         return this;
     }
+
     /**
      * Проверяет, что сообщение об ошибке содержит ожидаемый текст.
      *
@@ -44,6 +48,18 @@ public class RegisterPageAssertions {
                 "Сообщение об ошибке должно содержать: '" + expected + "', но получено: '" + actual + "'");
         return this;
     }
+
+    /**
+     * Проверяет, что серверная ошибка отсутствует (нет элемента .alert.alert-danger).
+     *
+     * @return этот же объект ассерта
+     */
+    public RegisterPageAssertions hasNoServerError() {
+        Assertions.assertFalse(page.isServerErrorPresent(),
+                "Не должно быть серверной ошибки");
+        return this;
+    }
+
     /**
      * Проверяет, что текущий URL содержит ожидаемую подстроку.
      *
@@ -55,42 +71,21 @@ public class RegisterPageAssertions {
                 "URL должен содержать: " + expectedPart);
         return this;
     }
+
     /**
-     * Проверяет сообщение валидации поля username.
+     * Проверяет, что сообщение валидации поля username содержит ожидаемую подстроку
+     * (без учёта регистра).
      *
-     * @param expected ожидаемое сообщение
+     * @param expected ожидаемая подстрока (например, "заполните это поле")
      * @return этот же объект ассерта
      */
-    public RegisterPageAssertions hasUsernameValidationMessage(String expected) {
+    public RegisterPageAssertions hasUsernameValidationMessageContaining(String expected) {
         String actual = page.getUsernameValidationMessage();
-        Assertions.assertEquals(expected, actual,
-                "Сообщение валидации для username не совпадает");
+        Assertions.assertTrue(actual.toLowerCase().contains(expected.toLowerCase()),
+                "Сообщение валидации username должно содержать: '" + expected + "', но получено: '" + actual + "'");
         return this;
     }
-    /**
-     * Проверяет сообщение валидации поля email.
-     *
-     * @param expected ожидаемое сообщение
-     * @return этот же объект ассерта
-     */
-    public RegisterPageAssertions hasEmailValidationMessage(String expected) {
-        String actual = page.getEmailValidationMessage();
-        Assertions.assertEquals(expected, actual,
-                "Сообщение валидации для email не совпадает");
-        return this;
-    }
-    /**
-     * Проверяет сообщение валидации поля password.
-     *
-     * @param expected ожидаемое сообщение
-     * @return этот же объект ассерта
-     */
-    public RegisterPageAssertions hasPasswordValidationMessage(String expected) {
-        String actual = page.getPasswordValidationMessage();
-        Assertions.assertEquals(expected, actual,
-                "Сообщение валидации для password не совпадает");
-        return this;
-    }
+
     /**
      * Проверяет, что сообщение валидации поля email содержит ожидаемую подстроку.
      *
@@ -100,7 +95,59 @@ public class RegisterPageAssertions {
     public RegisterPageAssertions hasEmailValidationMessageContaining(String expected) {
         String actual = page.getEmailValidationMessage();
         Assertions.assertTrue(actual.toLowerCase().contains(expected.toLowerCase()),
-                "Сообщение валидации email должно содержать: '" + expected + "'");
+                "Сообщение валидации email должно содержать: '" + expected + "', но получено: '" + actual + "'");
+        return this;
+    }
+
+    /**
+     * Проверяет, что сообщение валидации поля password содержит ожидаемую подстроку.
+     *
+     * @param expected ожидаемая подстрока
+     * @return этот же объект ассерта
+     */
+    public RegisterPageAssertions hasPasswordValidationMessageContaining(String expected) {
+        String actual = page.getPasswordValidationMessage();
+        Assertions.assertTrue(actual.toLowerCase().contains(expected.toLowerCase()),
+                "Сообщение валидации password должно содержать: '" + expected + "', но получено: '" + actual + "'");
+        return this;
+    }
+
+    /**
+     * Проверяет точное совпадение сообщения валидации поля username.
+     *
+     * @param expected ожидаемый текст
+     * @return этот же объект ассерта
+     */
+    public RegisterPageAssertions hasUsernameValidationMessage(String expected) {
+        String actual = page.getUsernameValidationMessage();
+        Assertions.assertEquals(expected, actual,
+                "Сообщение валидации username не совпадает");
+        return this;
+    }
+
+    /**
+     * Проверяет точное совпадение сообщения валидации поля email.
+     *
+     * @param expected ожидаемый текст
+     * @return этот же объект ассерта
+     */
+    public RegisterPageAssertions hasEmailValidationMessage(String expected) {
+        String actual = page.getEmailValidationMessage();
+        Assertions.assertEquals(expected, actual,
+                "Сообщение валидации email не совпадает");
+        return this;
+    }
+
+    /**
+     * Проверяет точное совпадение сообщения валидации поля password.
+     *
+     * @param expected ожидаемый текст
+     * @return этот же объект ассерта
+     */
+    public RegisterPageAssertions hasPasswordValidationMessage(String expected) {
+        String actual = page.getPasswordValidationMessage();
+        Assertions.assertEquals(expected, actual,
+                "Сообщение валидации password не совпадает");
         return this;
     }
 }

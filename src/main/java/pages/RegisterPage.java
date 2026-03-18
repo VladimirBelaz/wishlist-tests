@@ -1,14 +1,26 @@
 package pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import java.util.List;
+
 /**
  * Page Object для страницы регистрации (/register).
  * Содержит методы регистрации нового пользователя,
  * получения сообщений об ошибках сервера и браузерной валидации.
  */
 public class RegisterPage extends AbsBasePage {
+
+    // Локаторы
+    private final By usernameInputBy = By.cssSelector("input[type='text']");
+    private final By emailInputBy = By.cssSelector("input[type='email']");
+    private final By passwordInputBy = By.cssSelector("input[type='password']");
+    private final By registerButtonBy = By.cssSelector("button[type='submit']");
+    private final By errorAlertBy = By.cssSelector(".alert.alert-danger");
+
     /**
      * Конструктор страницы регистрации.
      *
@@ -18,12 +30,6 @@ public class RegisterPage extends AbsBasePage {
         super(driver, "/register");
     }
 
-    // Локаторы
-    private final By usernameInputBy = By.cssSelector("input[type='text']");
-    private final By emailInputBy = By.cssSelector("input[type='email']");
-    private final By passwordInputBy = By.cssSelector("input[type='password']");
-    private final By registerButtonBy = By.cssSelector("button[type='submit']");
-    private final By errorAlertBy = By.cssSelector(".alert.alert-danger");
     /**
      * Заполняет поле имени пользователя.
      *
@@ -35,6 +41,7 @@ public class RegisterPage extends AbsBasePage {
         input.clear();
         input.sendKeys(username);
     }
+
     /**
      * Заполняет поле email.
      *
@@ -46,6 +53,7 @@ public class RegisterPage extends AbsBasePage {
         input.clear();
         input.sendKeys(email);
     }
+
     /**
      * Заполняет поле пароля.
      *
@@ -57,6 +65,7 @@ public class RegisterPage extends AbsBasePage {
         input.clear();
         input.sendKeys(password);
     }
+
     /**
      * Кликает по кнопке "Зарегистрироваться".
      */
@@ -65,6 +74,7 @@ public class RegisterPage extends AbsBasePage {
         WebElement button = waiters.waitForElementClickable(registerButtonBy);
         button.click();
     }
+
     /**
      * Выполняет регистрацию с указанными данными.
      *
@@ -78,6 +88,7 @@ public class RegisterPage extends AbsBasePage {
         fillPassword(password);
         clickRegister();
     }
+
     /**
      * Проверяет, отображается ли сообщение об ошибке (серверное).
      *
@@ -90,6 +101,7 @@ public class RegisterPage extends AbsBasePage {
             return false;
         }
     }
+
     /**
      * Возвращает текст сообщения об ошибке.
      *
@@ -99,16 +111,18 @@ public class RegisterPage extends AbsBasePage {
         WebElement alert = waiters.waitForElementVisible(errorAlertBy);
         return alert.getText();
     }
+
     /**
-     * Возвращает сообщение валидации браузера для поля username (HTML5).
+     * Возвращает сообщение валидации браузера для поля username.
      *
      * @return сообщение валидации
      */
     public String getUsernameValidationMessage() {
         WebElement input = driver.findElement(usernameInputBy);
-        return (String) ((org.openqa.selenium.JavascriptExecutor) driver)
+        return (String) ((JavascriptExecutor) driver)
                 .executeScript("return arguments[0].validationMessage;", input);
     }
+
     /**
      * Возвращает сообщение валидации браузера для поля email (HTML5).
      *
@@ -116,18 +130,28 @@ public class RegisterPage extends AbsBasePage {
      */
     public String getEmailValidationMessage() {
         WebElement input = driver.findElement(emailInputBy);
-        return (String) ((org.openqa.selenium.JavascriptExecutor) driver)
+        return (String) ((JavascriptExecutor) driver)
                 .executeScript("return arguments[0].validationMessage;", input);
     }
+
     /**
-     * Возвращает сообщение валидации браузера для поля password (HTML5).
+     * Возвращает сообщение валидации браузера для поля password.
      *
      * @return сообщение валидации
      */
     public String getPasswordValidationMessage() {
         WebElement input = driver.findElement(passwordInputBy);
-        return (String) ((org.openqa.selenium.JavascriptExecutor) driver)
+        return (String) ((JavascriptExecutor) driver)
                 .executeScript("return arguments[0].validationMessage;", input);
     }
 
+    /**
+     * Проверяет наличие серверной ошибки без ожидания.
+     *
+     * @return true, если элемент ошибки присутствует на странице
+     */
+    public boolean isServerErrorPresent() {
+        List<WebElement> errors = driver.findElements(errorAlertBy);
+        return !errors.isEmpty();
+    }
 }
