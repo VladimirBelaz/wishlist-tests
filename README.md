@@ -35,7 +35,7 @@
 - Кастомные исключения и ассерты
 
 ## Структура проекта
-'''
+```
 src/
 ├── main/
 │ ├── java/
@@ -53,4 +53,4 @@ src/
 ├── AuthTest.java
 ├── RegistrationTest.java
 └── WishListTest.java
-'''
+```
