@@ -76,17 +76,17 @@ src/
 
 ### Команды Maven
 
-## Запуск всех тестов (Chrome)
+# Запуск всех тестов (Chrome)
 ```mvn clean test```
-## Запуск в Firefox
+# Запуск в Firefox
 ```mvn clean test -Pfirefox-tests```
-## Запуск в Edge
+# Запуск в Edge
 ```mvn clean test -Pedge-tests```
-## Запуск конкретного тестового класса
+# Запуск конкретного тестового класса
 ```mvn clean test -Dtest=WishListTest```
-## Запуск одного теста
+# Запуск одного теста
 ```mvn clean test -Dtest=WishListTest#testCreateWishList```
-## Переопределение параметров
+# Переопределение параметров
 ```mvn clean test -DUSERNAME=myuser -DPASSWORD=mypass -Dheadless=true```
 
 Примечание: по умолчанию используется браузер Chrome. Для Firefox или Edge используйте соответствующий профиль.
