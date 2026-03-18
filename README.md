@@ -74,7 +74,7 @@ src/
 | `browser`  | Браузер (`CHROME`, `FIREFOX`, `EDGE`) | `CHROME`                                 |
 | `headless` | Headless-режим (`true`/`false`)       | `false`                                  |
 
-### Команды Maven
+## Команды Maven
 
 # Запуск всех тестов (Chrome)
 ```mvn clean test```
